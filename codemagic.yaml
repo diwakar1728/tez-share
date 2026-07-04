@@ -14,6 +14,18 @@ workflows:
           PERMISSIONS='    <uses-permission android:name="android.permission.INTERNET"/>\n    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>\n    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE"/>\n'
           awk -v perms="$PERMISSIONS" '{print} /<manifest/{print perms}' "$MANIFEST" > tmp_manifest && mv tmp_manifest "$MANIFEST"
           cat "$MANIFEST"
+      - name: Bump compileSdk/targetSdk (file_picker needs SDK 36+)
+        script: |
+          if [ -f android/app/build.gradle.kts ]; then
+            perl -pi -e 's/compileSdk = flutter\.compileSdkVersion/compileSdk = 36/' android/app/build.gradle.kts
+            perl -pi -e 's/targetSdk = flutter\.targetSdkVersion/targetSdk = 36/' android/app/build.gradle.kts
+            cat android/app/build.gradle.kts
+          fi
+          if [ -f android/app/build.gradle ]; then
+            perl -pi -e 's/compileSdkVersion flutter\.compileSdkVersion/compileSdkVersion 36/' android/app/build.gradle
+            perl -pi -e 's/targetSdkVersion flutter\.targetSdkVersion/targetSdkVersion 36/' android/app/build.gradle
+            cat android/app/build.gradle
+          fi
       - name: Get Flutter packages
         script: |
           flutter pub get
