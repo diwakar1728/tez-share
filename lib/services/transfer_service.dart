@@ -166,12 +166,13 @@ class TransferService {
           totalBytes: totalBytes,
           isDone: true,
         ));
-      } else {
+     } else {
+        final errorBody = await response.stream.bytesToString();
         onProgress(TransferProgress(
           bytesSent: sent,
           totalBytes: totalBytes,
           isError: true,
-          errorMessage: 'Server responded with ${response.statusCode}',
+          errorMessage: 'Server error ${response.statusCode}: $errorBody',
         ));
       }
     } catch (e) {
