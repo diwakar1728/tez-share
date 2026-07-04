@@ -17,14 +17,20 @@ workflows:
       - name: Bump compileSdk/targetSdk (file_picker needs SDK 36+)
         script: |
           if [ -f android/app/build.gradle.kts ]; then
-            perl -pi -e 's/compileSdk = flutter\.compileSdkVersion/compileSdk = 36/' android/app/build.gradle.kts
-            perl -pi -e 's/targetSdk = flutter\.targetSdkVersion/targetSdk = 36/' android/app/build.gradle.kts
-            cat android/app/build.gradle.kts
+            echo "--- BEFORE PATCH (build.gradle.kts) ---"
+            grep -n "compileSdk\|targetSdk" android/app/build.gradle.kts
+            perl -pi -e 's/^(\s*compileSdk\s*=\s*).*$/${1}36/' android/app/build.gradle.kts
+            perl -pi -e 's/^(\s*targetSdk\s*=\s*).*$/${1}36/' android/app/build.gradle.kts
+            echo "--- AFTER PATCH (build.gradle.kts) ---"
+            grep -n "compileSdk\|targetSdk" android/app/build.gradle.kts
           fi
           if [ -f android/app/build.gradle ]; then
-            perl -pi -e 's/compileSdkVersion flutter\.compileSdkVersion/compileSdkVersion 36/' android/app/build.gradle
-            perl -pi -e 's/targetSdkVersion flutter\.targetSdkVersion/targetSdkVersion 36/' android/app/build.gradle
-            cat android/app/build.gradle
+            echo "--- BEFORE PATCH (build.gradle) ---"
+            grep -n "compileSdkVersion\|targetSdkVersion" android/app/build.gradle
+            perl -pi -e 's/^(\s*compileSdkVersion\s+).*$/${1}36/' android/app/build.gradle
+            perl -pi -e 's/^(\s*targetSdkVersion\s+).*$/${1}36/' android/app/build.gradle
+            echo "--- AFTER PATCH (build.gradle) ---"
+            grep -n "compileSdkVersion\|targetSdkVersion" android/app/build.gradle
           fi
       - name: Get Flutter packages
         script: |
