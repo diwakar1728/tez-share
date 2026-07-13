@@ -1,3 +1,4 @@
+import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -45,11 +46,12 @@ class TransferService {
   Future<Directory> getReceivedFolder() async {
     Directory base;
     if (Platform.isAndroid) {
-      // App-specific external storage — no special runtime permission
-      // needed on any Android version, and it's still easy for the user
-      // to find (visible to file managers under Android/data/.../files).
-      final extDir = await getExternalStorageDirectory();
-      base = Directory(p.join(extDir!.path, 'TezShare Received'));
+      // "All files access" permission maango taaki public Downloads
+      // folder me seedha save kar sakein (sirf pehli baar poochega).
+      if (!await Permission.manageExternalStorage.isGranted) {
+        await Permission.manageExternalStorage.request();
+      }
+      base = Directory('/storage/emulated/0/Download/TezShare');
     } else if (Platform.isWindows) {
       final userProfile = Platform.environment['USERPROFILE'] ?? '.';
       base = Directory(p.join(userProfile, 'Downloads', 'TezShare'));
