@@ -89,9 +89,10 @@ class TransferService {
       String targetPath = p.join(folder.path, safeName);
       targetPath = _avoidOverwrite(targetPath);
 
-      final file = File(targetPath);
+     final file = File(targetPath);
       final sink = file.openWrite();
-      await request.read().pipe(sink);
+      await sink.addStream(request.read());
+      await sink.close();
 
       onFileReceived?.call(targetPath);
 
