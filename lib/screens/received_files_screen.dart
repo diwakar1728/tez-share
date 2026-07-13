@@ -1,3 +1,4 @@
+import 'package:open_filex/open_filex.dart';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
@@ -77,6 +78,7 @@ class _ReceivedFilesScreenState extends State<ReceivedFilesScreen> {
                         title: Text(p.basename(file.path),
                             maxLines: 1, overflow: TextOverflow.ellipsis),
                         subtitle: Text(_formatSize(stat.size)),
+                        onTap: () => OpenFilex.open(file.path),
                       ),
                     );
                   },
