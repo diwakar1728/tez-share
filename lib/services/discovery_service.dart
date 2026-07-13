@@ -93,7 +93,7 @@ class DiscoveryService {
     }
   }
 
-  void _broadcast() {
+void _broadcast() async {
     if (_socket == null) return;
     final payload = jsonEncode({
       'id': myId,
@@ -103,9 +103,25 @@ class DiscoveryService {
     final data = utf8.encode(payload);
     try {
       _socket!.send(data, InternetAddress('255.255.255.255'), kDiscoveryPort);
-    } catch (_) {
-      // ignore send errors (e.g. network temporarily unavailable)
-    }
+    } catch (_) {}
+
+    // Kuch phone hotspots pe global broadcast kaam nahi karta,
+    // isliye apne subnet ke exact broadcast address pe bhi bhejte hain.
+    try {
+      final interfaces = await NetworkInterface.list(
+        type: InternetAddressType.IPv4,
+        includeLoopback: false,
+      );
+      for (final iface in interfaces) {
+        for (final addr in iface.addresses) {
+          final parts = addr.address.split('.');
+          if (parts.length == 4) {
+            final subnetBroadcast = '${parts[0]}.${parts[1]}.${parts[2]}.255';
+            _socket!.send(data, InternetAddress(subnetBroadcast), kDiscoveryPort);
+          }
+        }
+      }
+    } catch (_) {}
   }
 
   void _cleanupPeers() {
